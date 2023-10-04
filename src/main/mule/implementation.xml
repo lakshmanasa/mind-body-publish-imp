@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="d5b16f44-11a6-442a-a4a7-78c723ae54ab" >
+		<http:listener-connection host="0.0.0.0" port="8087" />
+	</http:listener-config>
+
+	<flow name="publish-mindFlow" doc:id="98e4ec66-ddf5-416b-88ff-2cf32e64f07b" >
+		<scheduler doc:name="Scheduler" doc:id="e43a663d-edcd-49b7-aa9c-f5916e95c49b" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="3" timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</scheduler>
+		<logger level="INFO" doc:name="Logger" doc:id="fa5229f2-7fb5-4253-bedb-5d3709667946" message="The cursor is in JMS Publish to fetch the record of which Status = 'New'::::: #[payload]"/>
+		<ee:transform doc:name="fetching the records when status ='New&quot;" doc:id="f43d5ac0-a6f6-4cf8-a139-7e38407d5cb1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"compositeRequest": [
+		 {
+      "method": "GET",
+      "url": "/services/data/v51.0/query/?q= SELECT Id FROM BillingJunction__c where IntegrationStatus__c = 'New'",
+      "referenceId": "a"}
+	]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="values of /sapi/sfdc to get the records" doc:id="2021df63-2ec3-448f-8394-ec9d7fd7613c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="method" ><![CDATA["POST"]]></ee:set-variable>
+				<ee:set-variable variableName="port" ><![CDATA['${http.req.sfdc.port}']]></ee:set-variable>
+				<ee:set-variable variableName="basepath" ><![CDATA["/api/sapi"]]></ee:set-variable>
+				<ee:set-variable variableName="path" ><![CDATA["/sfdc/accounts"]]></ee:set-variable>
+				<ee:set-variable variableName="host" ><![CDATA['${http.req.host}']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="calling to common HttpRequest" doc:id="57e7254f-ff7e-43b6-91e9-56ab21feac3f" name="common-HttpRequest"/>
+		<ee:transform doc:name="output of BillingJunction" doc:id="f6875584-3894-403e-afc9-a0f16db858f9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transforming the data by using map" doc:id="ed534bca-b493-4cea-82e1-25c99923408c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var a = flatten(payload.compositeResponse.body.records)
+---
+a map{
+    Id: $.Id
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="d120131b-3914-49f8-a4cf-1be7a8f3ca9d" >
+			<try doc:name="Try" doc:id="486a3408-f478-4b27-98f2-e7f6be8687ae">
+			<set-variable value="#[payload.Id]" doc:name="storingId" doc:id="70545290-ee95-4c68-8202-9410603fef7c" variableName="storingId" />
+			<ee:transform doc:name="updating the status field New to In-Progress" doc:id="565d8cf6-0167-465b-b91b-37a3411b2926">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"compositeRequest":[{
+		"method": "PATCH",
+		"url": "/services/data/v51.0/sobjects/BillingJunction__c/Id/" ++ vars.storingId as String,
+		"referenceId": "a",
+		"body": {
+			IntegrationStatus__c: "In-Progress"
+			
+		}}]}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+				<ee:transform doc:name="values of /sapi/sfdc to update a record" doc:id="7bdc2493-e39c-4700-b533-6432ff9ebb3a" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="method" ><![CDATA["POST"]]></ee:set-variable>
+						<ee:set-variable variableName="basepath" ><![CDATA["/api/sapi"]]></ee:set-variable>
+						<ee:set-variable variableName="path" ><![CDATA["/sfdc/accounts"]]></ee:set-variable>
+						<ee:set-variable variableName="port" ><![CDATA['${http.req.sfdc.port}']]></ee:set-variable>
+						<ee:set-variable variableName="host" ><![CDATA['${http.req.host}']]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="calling to common HttpRequest" doc:id="89658d5d-1073-480f-8d21-66a01079a3a4" name="common-HttpRequest"/>
+			<ee:transform doc:name="output of BillingJunction after updating the data" doc:id="1ba3885a-eaf1-46a9-9632-77c101774f29">
+				<ee:message>
+					<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+				<ee:transform doc:name="Placing the Billing Id in InternalId" doc:id="03e88dd7-33b0-45f9-bd4f-d12da8bbb757">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    
+  "eventId": uuid(),
+  "eventType": "2",
+  "eventData": [
+    {
+      "internalId": vars.storingId
+    }
+  ],
+  "source": "salesforce",
+  "targets": "database",
+  "dataType": "object",
+  "timeStamp": (now() >> "IST") as String {format: "dd-MMMM-YYYY"}
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+				<jms:publish-consume doc:name="Publish consume" doc:id="5aac55fe-593f-484e-9d2a-420c710d4f7c" config-ref="JMS_Config" destination="BillingId">
+			<jms:message outboundContentType="application/json" />
+			<jms:publish-configuration persistentDelivery="true" />
+			<jms:consume-configuration maximumWait="8" maximumWaitUnit="MINUTES" />
+		</jms:publish-consume>
+				<ee:transform doc:name="Transform Message" doc:id="1fcc8e5c-2a5e-4626-86e8-5e841da697dd" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<set-variable value="#[(vars.pass default []) + payload]" doc:name="passRecords" doc:id="b26b0b72-70aa-44b0-b3a8-b4a2b1a09baa" variableName="pass" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="17f1bc4b-67d8-44ab-9122-5a450d5a2fda" >
+						<set-payload value="#[payload]" doc:name="Set Payload" doc:id="92918fb9-3afd-4cc9-9c5d-f22ee53d6245" />
+						<set-variable value="#[(vars.fail default[]) + payload]" doc:name="failRecords" doc:id="6cb1b787-ecc9-4ec1-9568-a858e4654360" variableName="fail"/>
+					</on-error-continue>
+				</error-handler>
+		</try>
+		</foreach>
+		<ee:transform doc:name="it will print data after completion of whole process" doc:id="f78a01c1-6a63-4b1b-a618-e99f8b2e6565" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"pass": vars.pass,
+	"fail": vars.fail
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<error-handler ref="error-framework-jms-Error_Handler" />
+	</flow>
+</mule>

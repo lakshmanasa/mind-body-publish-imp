@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<error-handler name="error-framework-jms-Error_Handler" doc:id="f246b2bf-3cbd-49c6-a2bf-678b3a0bfc4f" >
+
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1d832935-dfb9-475e-8037-20ca232afb0e" type="HTTP:BAD_GATEWAY">
+			<set-variable value='#[{"statusCode": "502",
+	"message": error.errorType.identifier
+}]' doc:name="httpStatus-502" doc:id="0f3a7ba6-fde0-44b1-a6bb-8bcd66f2217d" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="5301eb97-118f-4e91-9ca4-caba143b0677" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="cea2b467-6350-4717-82a5-2c392028767f" type="HTTP:BAD_REQUEST">
+			<set-variable value='#[{"statusCode": "400",
+	"message": error.errorType.identifier
+}]' doc:name="httpStatus-400" doc:id="f6f72d8c-6544-4838-9e16-e80da60a7f0d" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="c59ffd00-1d87-4123-b641-095f81fc1693" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2a130e67-ed01-4f8d-b8a4-0d1428c14efc" type="HTTP:CLIENT_SECURITY">
+			<set-variable value='#[{"statusCode": "401",
+	"message": error.errorType.identifier
+}]' doc:name="httpStatus-401" doc:id="389f06ce-96a8-4bf9-aefb-4d839694660f" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="1360f1a3-271c-4116-9ef8-4c4cb5b8f444" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="8b23bd4f-82d2-4cee-b289-655105185b9a" type="HTTP:CONNECTIVITY">
+			<set-variable value='#[{"statusCode": "500",
+	"message": error.errorType.identifier
+}]' doc:name="httpStatus-500" doc:id="f269f316-b480-4829-90ab-7b185643a5a8" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="160db45e-bd20-450d-96b8-f9514d3abbf9" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="1f3e2782-2882-4212-a492-397d15582475" type="HTTP:FORBIDDEN">
+			<set-variable value='#[{"statusCode": "403",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-403" doc:id="c77fd1f7-7b35-4570-9ce1-e4fb25269913" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="496f5a69-f904-47bb-9087-961cf3c630cb" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="689a875e-7237-4c0c-b886-8bfc28e561f9" type="HTTP:METHOD_NOT_ALLOWED">
+			<set-variable value='#[{"statusCode": "405",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-405" doc:id="1d41ea51-6ee2-4f74-902c-7ff072c2bc87" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="20767695-ded5-4098-b1f6-c7d57d730cbe" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a6e73c00-801e-4010-bbbd-8441d7b132d4" type="HTTP:NOT_ACCEPTABLE">
+			<set-variable value='#[{"statusCode": "406",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-406" doc:id="0c2fcd97-09da-41c6-aa95-126e069b1d80" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="96ea106f-ee56-4365-8610-831b7d61acc9" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d4ae4c15-a682-4e27-808f-34da66a5c6e1" type="HTTP:NOT_FOUND">
+			<set-variable value='#[{"statusCode": "404",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-404" doc:id="274128e2-3865-480a-93ef-db4ed89320e6" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="26268d8a-47ec-4cf8-9e9c-2f8a12e4f9ed" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="14ace0e0-f1cd-4397-aebd-c9049b193583" type="HTTP:PARSING">
+			<set-variable value='#[{"statusCode": "400",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-400" doc:id="22ca07b5-a64e-41c6-b25d-94aefd89b8d5" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="275a22f2-a6ff-47d0-93a6-e939013e6d97" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="46fe51aa-e9e7-4aea-8fcb-42f33d4330dc" type="HTTP:RETRY_EXHAUSTED">
+			<set-variable value='#[{"statusCode": "503",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-503" doc:id="f705e1eb-d178-455c-bb9f-9e9aa4a5a01c" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="5fe0c5f1-c1b2-4241-8b6d-3f63c5a3adf2" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="27185c80-f348-4de1-a82e-af1f9aee34b1" type="HTTP:SECURITY">
+			<set-variable value='#[{"statusCode": "401",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-401" doc:id="4e2882a9-0bfc-40e0-825a-eea61b4a520d" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="b4dae01a-b444-41b2-9870-01c8a9a415b7" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9e7432d8-e8bb-4d29-a4f2-6d187acc8f44" type="HTTP:SERVICE_UNAVAILABLE">
+			<set-variable value='#[{"statusCode": "503",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-503" doc:id="c7379e94-b722-41ee-8b2b-1679a35697c0" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="6f670191-cd33-4c54-9fef-3a7580b6a9d8" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6509c265-6aeb-4608-9843-e6b717455343" type="HTTP:TIMEOUT">
+			<set-variable value='#[{"statusCode": "504",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-504" doc:id="383f1e61-2f89-4a0d-bd73-8df01dcf2f78" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="fd58dfff-1573-43f4-a4d4-0b06865e802c" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="00ec6a40-91fd-4b9a-ad4a-df6937dfc4ae" type="HTTP:TOO_MANY_REQUESTS">
+			<set-variable value='#[{"statusCode": "429",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-429" doc:id="d414aeea-b7cd-45ab-812f-ce02e45c638b" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="872f8ba4-dff5-4dba-8988-4d6d9c2fdb8a" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4b129cfc-601b-4dfc-a066-2b5576c9884c" type="HTTP:UNAUTHORIZED">
+			<set-variable value='#[{"statusCode": "401",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-401" doc:id="de34c8d6-fa3c-488d-9ee7-a70a89fa98cf" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="3800ab15-b202-4f88-9e30-b6707e60eedf" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="80a6a64e-02aa-4acf-adae-6b50b5de1ed8" type="HTTP:UNSUPPORTED_MEDIA_TYPE">
+			<set-variable value='#[{"statusCode": "415",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-415" doc:id="741708a8-1873-40f1-8b6b-ab8895e0465c" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="dc61737a-6f1c-468d-8a4b-d02cc3bc37df" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="67c1f45d-06cc-412a-a6c8-5b02376a9508" type="HTTP:INTERNAL_SERVER_ERROR">
+			<set-variable value='#[{"statusCode": "500"
+	
+}]' doc:name="httpStatus-500" doc:id="ce6d7542-cd73-4381-aff3-2c1ad96aa1b5" variableName="Status"/>
+			<ee:transform doc:name="Transform Message" doc:id="860d7df1-f03a-47c1-9f01-8dd0dc6a6ea3" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+error.muleMessage.typedValue]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[vars.Status.statusCode]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="41f59890-98be-47bd-8e46-aed1d0de05d7" type="JMS:CONNECTIVITY">
+			<set-variable value='#[{"statusCode": "500",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-500" doc:id="5a8caf44-3136-441b-a2e5-ae6e1f2abc5b" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="cb4addab-e438-4357-86ba-c9455136801c" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="a1a0943e-2fd2-4601-a9b7-435fa746b4bc" type="JMS:DESTINATION_NOT_FOUND">
+			<set-variable value='#[{"statusCode": "404",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-404" doc:id="fb371f5a-201a-4673-945d-98e5e838e3df" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="e5dcbeab-77f6-4b19-83e9-9c9473d77a88" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2c846f5a-0d54-4970-a93f-a67bec568464" type="JMS:ILLEGAL_BODY">
+			<set-variable value='#[{"statusCode": "500",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-500" doc:id="4b5232d0-aa10-483d-9dd3-2fd6a959bb21" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="168a74e4-93a3-4594-81cb-2c4a86f0f8d9" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="136186d1-fe98-4377-a66e-f7ac10f280c0" type="JMS:PUBLISHING">
+			<set-variable value='#[{"statusCode": "500",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-500" doc:id="9ac09bb6-8f6d-4e27-87a0-d2e7a533960a" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="834931d3-5ef2-4fe7-b3be-6d3d21158c75" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="201a8017-31ea-44ef-beec-8a4fa72f901a" type="JMS:RETRY_EXHAUSTED">
+			<set-variable value='#[{"statusCode": "503",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-503" doc:id="0fa0361a-b432-40e8-b977-97bb6f201123" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="72a9e06c-23e4-4bbe-a7cb-3a87b4364990" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="feb09186-5572-4864-9e94-c0f19d547da0" type="JMS:SECURITY">
+			<set-variable value='#[{"statusCode": "401",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-401" doc:id="189f98bd-e0b6-4fb7-aea5-1b91222b1c76" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="dfbb0681-a8bb-40ba-88c5-e5143b56ca5d" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="c68acc68-4407-4ba4-8fa5-a19d76bad6d1" type="ANY">
+			<set-variable value='#[{"statusCode": "500",&#10;	"message": error.errorType.identifier&#10;}]' doc:name="httpStatus-500" doc:id="a7f531cd-b2dd-4359-8c99-0e321b786013" variableName="Status"/>
+			<flow-ref doc:name="Flow Reference" doc:id="0f4435e5-18e6-466f-8798-f0d25238c004" name="error-framework-jms-Sub_Flow"/>
+		</on-error-propagate>
+        
+</error-handler>
+	<sub-flow name="error-framework-jms-Sub_Flow" doc:id="c574fadf-5c03-48ef-89cb-864dcc9682ca" >
+		<ee:transform doc:name="Transform Message" doc:id="5f95364d-45f0-4ddc-ac19-f3a701c2b57a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"errorType": error.errorType.asString as String,
+	"errorCause": error.description as String,
+	"statusCode": vars.Status.statusCode,
+	"errorMessage": vars.Status.message
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="httpStatus" ><![CDATA[vars.Status.statusCode]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+
+</mule>
